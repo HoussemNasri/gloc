@@ -9,9 +9,10 @@ export const renderLocs = (linksData: InitialData, token: string) => {
 	linksData.links.map((anchor: HTMLAnchorElement, index) => {
 		const repoName = anchor.getAttribute('href');
 
-		const placeToInsert = linksData.linksToInsert[index] || anchor;
+		const placeToInsert = anchor;
 
 		if (repoName) {
+			console.log(`${repoName} has Href`)
 			const renderLoaderFunc = makeRenderLoaderFunc(placeToInsert);
 
 			renderLoaderFunc(LOADING_OUTPUT);

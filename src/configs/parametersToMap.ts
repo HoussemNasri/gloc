@@ -65,7 +65,7 @@ export const parametersToMap: ParameterToMap[] = [
 	{
 		locationName: LOCATION.EXPLORE,
 		selector: 'querySelectorAll',
-		pathToSelect: 'article h3 a.text-bold ',
+		pathToSelect: 'article h3 a.text-bold',
 		existenceChecker: (entity: HTMLAnchorElement[]) =>
 			currentUserLocation === LOCATION.EXPLORE.toLowerCase() && entity && entity.length > 0,
 		wrapper: (entity) => Array.prototype.slice.call(entity),

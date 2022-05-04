@@ -12,7 +12,6 @@ export const renderLocs = (linksData: InitialData, token: string) => {
 		const placeToInsert = anchor;
 
 		if (repoName) {
-			console.log(`${repoName} has Href`)
 			const renderLoaderFunc = makeRenderLoaderFunc(placeToInsert);
 
 			renderLoaderFunc(LOADING_OUTPUT);

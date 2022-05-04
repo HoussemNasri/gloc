@@ -14,6 +14,8 @@ export interface ParameterToMap {
 
 const currentUserLocation = window.location.pathname.replace('/', '');
 
+const orgAllReposPathRegex : RegExp = /\/orgs\/.*\/repositories/g;
+
 export const parametersToMap: ParameterToMap[] = [
 	{
 		/*
@@ -23,25 +25,24 @@ export const parametersToMap: ParameterToMap[] = [
 		selector: 'querySelectorAll',
 		pathToSelect: '.js-pinned-items-reorder-list .pinned-item-list-item-content div a',
 		pathToInsert: '.wb-break-all',
-		existenceChecker: (entity: HTMLAnchorElement[]) => entity && entity.length > 0,
-		wrapper: (entity) => Array.prototype.slice.call(entity),
-	},
-	{
-		/*
-			https://github.com/torvalds
-		*/
-		locationName: LOCATION.POPULAR_REPOS,
-		selector: 'querySelectorAll',
-		pathToSelect: '.js-pinned-items-reorder-container ol li div div div a',
-		pathToInsert: '.wb-break-all',
-		existenceChecker: (entity: HTMLAnchorElement[]) => entity && entity.length > 0,
+		existenceChecker: (entity: HTMLAnchorElement[]) => entity && entity.length > 0 && (isOrganization() || isPerson()),
 		wrapper: (entity) => Array.prototype.slice.call(entity),
 	},
 	{
 		locationName: LOCATION.ORGANIZATION,
 		selector: 'querySelectorAll',
-		pathToSelect: '#org-repositories div ul div.flex-auto > h3 > a',
-		existenceChecker: (entity: HTMLAnchorElement[]) => entity && entity.length > 0,
+		pathToSelect: '#org-repositories div ul div.flex-auto a.text-bold',
+		existenceChecker: (entity: HTMLAnchorElement[]) => entity && entity.length > 0 && isOrganization(),
+		wrapper: (entity) => Array.prototype.slice.call(entity),
+	},
+	{
+		/*
+			https://github.com/orgs/JabRef/repositories
+		*/
+		locationName: LOCATION.ORGANIZATION_ALL_REPOSITORIES,
+		selector: 'querySelectorAll',
+		pathToSelect: '#org-repositories div h3 a',
+		existenceChecker: (entity: HTMLAnchorElement[]) => entity && entity.length > 0 && isOrganization() && orgAllReposPathRegex.test(window.location.pathname),
 		wrapper: (entity) => Array.prototype.slice.call(entity),
 	},
 	{
@@ -52,12 +53,12 @@ export const parametersToMap: ParameterToMap[] = [
 		wrapper: (entity) => Array.prototype.slice.call(entity),
 	},
 	{
-		locationName: LOCATION.SINGLE,
-		selector: 'querySelector',
-		pathToSelect: '.application-main strong a',
 		/*
 			for example: https://github.com/kas-elvirov/gloc
 		*/
+		locationName: LOCATION.SINGLE,
+		selector: 'querySelector',
+		pathToSelect: '.application-main strong a',
 		pathToInsert: '.public',
 		existenceChecker: (entity: HTMLAnchorElement[]) => Boolean(entity),
 		wrapper: (entity: HTMLAnchorElement) => [entity],
@@ -85,14 +86,14 @@ export const parametersToMap: ParameterToMap[] = [
 		locationName: LOCATION.USER_REPOSITORIES,
 		selector: 'querySelectorAll',
 		pathToSelect: '#user-repositories-list ul li h3 a',
-		existenceChecker: (entity: HTMLAnchorElement[]) => entity && entity.length > 0,
+		existenceChecker: (entity: HTMLAnchorElement[]) => entity && entity.length > 0 && isPerson() && new URLSearchParams(window.location.search).get("tab") === "repositories",
 		wrapper: (entity) => Array.prototype.slice.call(entity),
 	},
 	{
 		locationName: LOCATION.LIKED_REPOS,
 		selector: 'querySelectorAll',
 		pathToSelect: '.page-profile h3 a',
-		existenceChecker: (entity: HTMLAnchorElement[]) => entity && entity.length > 0,
+		existenceChecker: (entity: HTMLAnchorElement[]) => entity && entity.length > 0 && new URLSearchParams(window.location.search).get("tab") === "stars",
 		wrapper: (entity) => Array.prototype.slice.call(entity),
 	},
 	{
@@ -103,3 +104,13 @@ export const parametersToMap: ParameterToMap[] = [
 		wrapper: undefined,
 	},
 ];
+
+const isOrganization = (): boolean => {
+	const nodes = document.querySelectorAll("[itemtype='http://schema.org/Organization']")
+	return nodes && nodes.length == 1;
+}
+
+const isPerson = (): boolean => {
+	const nodes = document.querySelectorAll("[itemtype='http://schema.org/Person']")
+	return nodes && nodes.length == 1;
+}

@@ -34,11 +34,12 @@ let githubToken = '';
 })();
 
 const gloc = (): void => {
-	getLinksFromDom()
-		.then(linksData => {
+	getLinksFromDom().forEach(promiseData => {
+		promiseData.then(linksData => {
 			renderLocs(linksData, githubToken);
 
 			log('info', linksData);
 		})
 		.catch(err => log('err', err));
+	});
 };
